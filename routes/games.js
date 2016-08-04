@@ -5,9 +5,14 @@ var database = new Firebase(process.env.FIREBASE_DB);
 var _ = require('lodash');
 
 /* GET grids listing. */
-router.get('/', function(req, res, next) {
-    function getGame1() {
-        return database.child('GameInProgress1').once('value')
+router.get('/:gameId', function(req, res, next) {
+    function getGame() {
+        var gameId = parseInt(req.params.gameId);
+        if (!gameId) {
+            returnError('Invalid game ID');
+        }
+        var gameName = 'GameInProgress' + gameId;
+        return database.child(gameName).once('value')
             .then(processGameAndReturn)
             .catch(returnError);
     }
@@ -25,7 +30,7 @@ router.get('/', function(req, res, next) {
         res.status(500).send(JSON.stringify({ "Error": reason }));
     }
     return database.authWithCustomToken(process.env.FIREBASE_KEY)
-        .then(getGame1)
+        .then(getGame)
         .catch(returnError);
 });
 
