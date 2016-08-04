@@ -7,7 +7,7 @@ var database = new Firebase(process.env.FIREBASE_DB);
 router.get('/', function(req, res, next) {
     function doStuff() {
         res.setHeader('Content-Type', 'application/json');
-        res.send(JSON.stringify({ a: 1 }));
+        res.send(JSON.stringify({ a: 'HOORAY' }));
     }
     function stuffIsBroken() {
         res.setHeader('Content-Type', 'application/json');
