@@ -11,3 +11,4 @@ An interface to the SMF/Softwire noughts & crosses DB!
     position: [row, column]
   }
   ```
+* `POST (hostname)/game/(gameNumber)` => creates new (blank) game!

@@ -103,15 +103,19 @@ router.post('/:gameId', function(req, res, next) {
         if (game) {
             return returnError('Game already exists!');
         }
-        var newGrid = [
-            ["-","-","-"],
-            ["-","-","-"],
-            ["-","-","-"]
-        ];
+        var newGame = {
+            player: "1",
+            row1: "-,-,-",
+            row2: "-,-,-",
+            row3: "-,-,-"
+        };
+
+        var gameName = 'GameInProgress' + req.params.gameId;
+
+        database.child(gameName).set(newGame);
 
         res.setHeader('Content-Type', 'application/json');
-        var successMessage = "Would create grid: " + JSON.stringify(newGrid);
-        res.send(JSON.stringify({"Success": successMessage}));
+        res.send(JSON.stringify({"Success": "Created new game!"}));
     }
     function returnError(reason) {
         var givenReason = reason || 'Mystery error';
