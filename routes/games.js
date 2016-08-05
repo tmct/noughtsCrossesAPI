@@ -34,8 +34,57 @@ router.get('/:gameId', function(req, res, next) {
 });
 
 router.post('/:gameId/move', function(req, res, next) {
-    res.setHeader('Content-Type', 'application/json');
-    res.status(500).send(JSON.stringify({ "Error": "Here's what you posted:", "body": req.body }));
+    var player = req.body.player;
+    if (!(_.includes([1,2], player))) {
+        return returnError('Player number must be 1 or 2');
+    }
+
+    var xPos = req.body.position[0] - 1;
+    var yPos = req.body.position[1] - 1;
+    if (xPos > 2 || xPos < 0){
+        return returnError('Invalid row index');
+    }
+    if (yPos > 2 || yPos < 0){
+        return returnError('Invalid column index');
+    }
+    function getGame() {
+        var gameId = parseInt(req.params.gameId);
+        if (!gameId) {
+            returnError('Invalid game ID');
+        }
+        var gameName = 'GameInProgress' + gameId;
+        return database.child(gameName).once('value')
+            .then(processGameAndDoMoreStuff)
+            .catch(returnError);
+    }
+    function processGameAndDoMoreStuff(snapshot) {
+        var game = snapshot.val();
+        if (!game) {
+            return returnError('Game does not exist');
+        }
+        var processedGame = processGame(game);
+
+        if (player !== processedGame.player) {
+            return returnError('It\'s not your turn');
+        }
+
+        var symbol = processedGame.grid[xPos][yPos];
+        if (symbol !== '-') {
+            return returnError('You can\'t go in that square!');
+        }
+        var newSymbol = player === 1 ? 'X' : '0';
+        res.setHeader('Content-Type', 'application/json');
+        var successMessage = "Would set square " + xPos + "," + yPos + " to " + newSymbol;
+        res.send(JSON.stringify({"Success": successMessage}));
+    }
+    function returnError(reason) {
+        var givenReason = reason || 'Mystery error';
+        res.setHeader('Content-Type', 'application/json');
+        res.status(500).send(JSON.stringify({ "Error": reason }));
+    }
+    return database.authWithCustomToken(process.env.FIREBASE_KEY)
+        .then(getGame)
+        .catch(returnError)
 });
 
 function processGame(game) {

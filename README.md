@@ -8,6 +8,6 @@ An interface to the SMF/Softwire noughts & crosses DB!
   ```javascript
   {
     player: (1 or 2),
-    position: [x, y]
+    position: [row, column]
   }
   ```
