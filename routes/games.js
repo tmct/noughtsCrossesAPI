@@ -4,7 +4,6 @@ var Firebase = require('firebase');
 var database = new Firebase(process.env.FIREBASE_DB);
 var _ = require('lodash');
 
-/* GET grids listing. */
 router.get('/:gameId', function(req, res, next) {
     function getGame() {
         var gameId = parseInt(req.params.gameId);
@@ -32,6 +31,11 @@ router.get('/:gameId', function(req, res, next) {
     return database.authWithCustomToken(process.env.FIREBASE_KEY)
         .then(getGame)
         .catch(returnError);
+});
+
+router.post('/:gameId/move', function(req, res, next) {
+    res.setHeader('Content-Type', 'application/json');
+    res.status(500).send(JSON.stringify({ "Error": "Here's what you posted:", "body": req.body }));
 });
 
 function processGame(game) {
